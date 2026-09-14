@@ -27,7 +27,7 @@
 
 // <o>the stack size of main thread<1-4086>
 //  <i>Default: 512
-#define RT_MAIN_THREAD_STACK_SIZE     256
+#define RT_MAIN_THREAD_STACK_SIZE     1024
 
 // </h>
 
@@ -77,7 +77,7 @@
 // </c>
 // <c1>Using Mutex
 //  <i>Using Mutex
-//#define RT_USING_MUTEX
+#define RT_USING_MUTEX
 // </c>
 // <c1>Using Event
 //  <i>Using Event
@@ -89,7 +89,7 @@
 // </c>
 // <c1>Using Message Queue
 //  <i>Using Message Queue
-//#define RT_USING_MESSAGEQUEUE
+#define RT_USING_MESSAGEQUEUE
 // </c>
 // </h>
 

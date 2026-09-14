@@ -24,6 +24,7 @@ INCLUDES := \
 	src \
 	CherryUSB/core \
 	CherryUSB/common \
+	CherryUSB/demo \
 	$(wildcard CherryUSB/class/*) \
 	rtos/rtthread-nano/rt-thread/include \
 	rtos/rtthread-nano/rt-thread/components/finsh \
@@ -68,14 +69,15 @@ SRC_DIR += \
 	$(CURDIR)/CherryUSB/demo \
 	$(CURDIR)/CherryUSB/core \
 	$(CURDIR)/CherryUSB/common \
+	$(CURDIR)/CherryUSB/osal \
 	$(wildcard $(CURDIR)/CherryUSB/class/*) \
 	$(CURDIR)/rtos/rtthread-nano/rt-thread/src \
 	$(CURDIR)/rtos/rtthread-nano/rt-thread/components/finsh \
 
 # --- Add C Source Files ---
 SRCS += \
-	$(CURDIR)/CherryUSB/demo/cdc_acm_template.c \
-	$(CURDIR)/CherryUSB/class/cdc/usbd_cdc_acm.c \
+	$(CURDIR)/CherryUSB/class/hub/usbh_hub.c \
+	$(CURDIR)/CherryUSB/osal/usb_osal_rtthread.c \
 	$(wildcard $(CURDIR)/src/*.c) \
 	$(wildcard $(CURDIR)/CherryUSB/core/*.c) \
 	$(wildcard $(CURDIR)/rtos/rtthread-nano/rt-thread/src/*.c) \

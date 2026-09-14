@@ -10,18 +10,13 @@
  */
 
 /* @include */
-#include <stdint.h>
+#include "usbh_core.h"
 
-/* @function declaration */
-void cdc_acm_init(uint8_t busid, uintptr_t reg_base);
-void cdc_acm_data_send_with_dtr_test(uint8_t busid);
+#define CONFIG_TEST_USBH_HID
+
+#include "usb_host.c"
 
 int main(void)
 {
-    cdc_acm_init(0, REG_BASE0);
-
-    while (1)
-    {
-        cdc_acm_data_send_with_dtr_test(0);
-    }
+    usbh_initialize(0, REG_BASE0, NULL);
 }
