@@ -22,20 +22,6 @@
 static void _usart_config(void);
 static uint32_t _systick_config(rt_uint32_t ticks);
 
-#if defined(RT_USING_USER_MAIN) && defined(RT_USING_HEAP)
-#define RT_HEAP_SIZE (1024)
-static uint32_t rt_heap[RT_HEAP_SIZE];     // heap default size: 4K(1024 * 4)
-RT_WEAK void *rt_heap_begin_get(void)
-{
-    return rt_heap;
-}
-
-RT_WEAK void *rt_heap_end_get(void)
-{
-    return rt_heap + RT_HEAP_SIZE;
-}
-#endif
-
 void rt_hw_board_init()
 {
     /* USART Configuration */
@@ -50,7 +36,9 @@ void rt_hw_board_init()
 #endif
 
 #if defined(RT_USING_USER_MAIN) && defined(RT_USING_HEAP)
-    rt_system_heap_init(rt_heap_begin_get(), rt_heap_end_get());
+    extern char _end;
+    extern char _heap_end;
+    rt_system_heap_init(&_end, &_heap_end);
 #endif
 }
 
@@ -61,10 +49,16 @@ static void _usart_config(void)
 
     RCC_PB2PeriphClockCmd(RCC_PB2Periph_AFIO | RCC_PB2Periph_USART1 | RCC_PB2Periph_GPIOA, ENABLE);
     GPIO_PinAFConfig(GPIOA, GPIO_PinSource9, GPIO_AF2);
+    GPIO_PinAFConfig(GPIOA, GPIO_PinSource10, GPIO_AF2);
 
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_High;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_High;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
     GPIO_Init(GPIOA, &GPIO_InitStructure);
 
     USART_InitStructure.USART_BaudRate = 921600;
@@ -72,7 +66,7 @@ static void _usart_config(void)
     USART_InitStructure.USART_StopBits = USART_StopBits_1;
     USART_InitStructure.USART_Parity = USART_Parity_No;
     USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-    USART_InitStructure.USART_Mode = USART_Mode_Tx;
+    USART_InitStructure.USART_Mode = USART_Mode_Tx | USART_Mode_Rx;
 
     USART_Init(USART1, &USART_InitStructure);
     USART_Cmd(USART1, ENABLE);
@@ -98,9 +92,20 @@ void rt_hw_console_output(const char *str)
 
     for (rt_size_t i = 0; i < size; i++)
     {
+        if (str[i] == '\n')
+        {
+            while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET);
+            USART_SendData(USART1, '\r');
+        }
+
         while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET);
         USART_SendData(USART1, str[i]);
     }
+}
+
+char rt_hw_console_getchar(void)
+{
+    return USART1->STATR & USART_FLAG_RXNE ? (USART1->DATAR & 0xFF) : -1;
 }
 
 void usb_dc_low_level_init(uint8_t busid)

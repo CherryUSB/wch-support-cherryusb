@@ -3,6 +3,22 @@ ifneq ($(filter all, $(MAKECMDGOALS)),)
         $(error No 'CHIP' parameter provided, Usage: make all CHIP=ch32v307vc)
     endif
 
+# --- Output Directories ---
+OBJECT_DIR := build/$(CHIP)/object
+OUTPUT_DIR := build/$(CHIP)/output
+
+# --- Create Output Directories ---
+$(shell mkdir -p $(OBJECT_DIR))
+$(shell mkdir -p $(OUTPUT_DIR))
+
+# --- Target and Output Files ---
+TARGET := $(notdir $(CHIP))
+ELF_FILE := $(OUTPUT_DIR)/$(TARGET).elf
+BIN_FILE := $(OUTPUT_DIR)/$(TARGET).bin
+HEX_FILE := $(OUTPUT_DIR)/$(TARGET).hex
+MAP_FILE := $(OUTPUT_DIR)/$(TARGET).map
+LST_FILE := $(OUTPUT_DIR)/$(TARGET).lst
+
 # --- Include Directories ---
 INCLUDES := \
 	src \
@@ -10,6 +26,7 @@ INCLUDES := \
 	CherryUSB/common \
 	$(wildcard CherryUSB/class/*) \
 	rtos/rtthread-nano/rt-thread/include \
+	rtos/rtthread-nano/rt-thread/components/finsh \
 
 # --- Assembly Source Directories ---
 ASM_DIR :=
@@ -53,6 +70,7 @@ SRC_DIR += \
 	$(CURDIR)/CherryUSB/common \
 	$(wildcard $(CURDIR)/CherryUSB/class/*) \
 	$(CURDIR)/rtos/rtthread-nano/rt-thread/src \
+	$(CURDIR)/rtos/rtthread-nano/rt-thread/components/finsh \
 
 # --- Add C Source Files ---
 SRCS += \
@@ -61,21 +79,12 @@ SRCS += \
 	$(wildcard $(CURDIR)/src/*.c) \
 	$(wildcard $(CURDIR)/CherryUSB/core/*.c) \
 	$(wildcard $(CURDIR)/rtos/rtthread-nano/rt-thread/src/*.c) \
+	$(CURDIR)/rtos/rtthread-nano/rt-thread/components/finsh/cmd.c \
+	$(CURDIR)/rtos/rtthread-nano/rt-thread/components/finsh/msh.c \
+	$(CURDIR)/rtos/rtthread-nano/rt-thread/components/finsh/shell.c \
 
 # --- Add Compiler Flags ---
 CFLAGS += -D__RTTHREAD__
-
-# --- Vpath for Source Files ---
-vpath %.S $(ASM_DIR)
-vpath %.c $(SRC_DIR)
-
-# --- Output Directories ---
-OBJECT_DIR := build/$(CHIP)/object
-OUTPUT_DIR := build/$(CHIP)/output
-
-# --- Create Output Directories ---
-$(shell mkdir -p $(OBJECT_DIR))
-$(shell mkdir -p $(OUTPUT_DIR))
 
 # --- Object Files ---
 OBJECT_FILES := \
@@ -85,13 +94,10 @@ OBJECT_FILES := \
 # --- Dependency Files ---
 -include $(OBJECT_FILES:.o=.d)
 
-# --- Target and Output Files ---
-TARGET := $(notdir $(CHIP))
-ELF_FILE := $(OUTPUT_DIR)/$(TARGET).elf
-BIN_FILE := $(OUTPUT_DIR)/$(TARGET).bin
-HEX_FILE := $(OUTPUT_DIR)/$(TARGET).hex
-MAP_FILE := $(OUTPUT_DIR)/$(TARGET).map
-LST_FILE := $(OUTPUT_DIR)/$(TARGET).lst
+# --- Vpath for Source Files ---
+vpath %.S $(ASM_DIR)
+vpath %.c $(SRC_DIR)
+
 endif
 
 # --- Build Targets ---

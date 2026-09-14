@@ -63,6 +63,6 @@ LDFLAGS += \
 	-Xlinker \
 	--gc-sections \
 	-Wl,--print-memory-usage \
-	-Wl,-Map,$(OUTPUT_DIR)/$(TARGET).map \
+	-Wl,-Map,$(MAP_FILE) \
 	--specs=nano.specs \
 	--specs=nosys.specs \
