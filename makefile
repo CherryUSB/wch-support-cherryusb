@@ -9,6 +9,7 @@ INCLUDES := \
 	CherryUSB/core \
 	CherryUSB/common \
 	$(wildcard CherryUSB/class/*) \
+	rtos/rtthread-nano/rt-thread/include \
 
 # --- Assembly Source Directories ---
 ASM_DIR :=
@@ -50,7 +51,8 @@ SRC_DIR += \
 	$(CURDIR)/CherryUSB/demo \
 	$(CURDIR)/CherryUSB/core \
 	$(CURDIR)/CherryUSB/common \
-	$(wildcard $(CURDIR)/CherryUSB/class/*)
+	$(wildcard $(CURDIR)/CherryUSB/class/*) \
+	$(CURDIR)/rtos/rtthread-nano/rt-thread/src \
 
 # --- Add C Source Files ---
 SRCS += \
@@ -58,6 +60,10 @@ SRCS += \
 	$(CURDIR)/CherryUSB/class/cdc/usbd_cdc_acm.c \
 	$(wildcard $(CURDIR)/src/*.c) \
 	$(wildcard $(CURDIR)/CherryUSB/core/*.c) \
+	$(wildcard $(CURDIR)/rtos/rtthread-nano/rt-thread/src/*.c) \
+
+# --- Add Compiler Flags ---
+CFLAGS += -D__RTTHREAD__
 
 # --- Vpath for Source Files ---
 vpath %.S $(ASM_DIR)
