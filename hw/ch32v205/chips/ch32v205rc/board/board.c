@@ -12,11 +12,24 @@
 /* @include */
 #include <rtthread.h>
 
+#include "usbh_core.h"
+
 #include "ch32v205.h"
 
 /* @define */
 #define GET_INT_SP()    asm("csrrw sp,mscratch,sp")
 #define FREE_INT_SP()   asm("csrrw sp,mscratch,sp")
+
+/* @enum */
+typedef enum
+{
+    WORK_MODE_IDLE,
+    WORK_MODE_USBH,
+    WORK_MODE_USBD,
+} work_mode_t;
+
+/* @global */
+work_mode_t work_mode = WORK_MODE_IDLE;
 
 /* @function declaration */
 static void _usart_config(void);
@@ -125,6 +138,8 @@ void usb_dc_low_level_init(uint8_t busid)
 
         /* Enable USBHS interrupt */
         NVIC_EnableIRQ(USBHS_IRQn);
+
+        work_mode = WORK_MODE_USBD;
     }
 }
 
@@ -135,7 +150,39 @@ void usb_dc_low_level_deinit(uint8_t busid)
         NVIC_DisableIRQ(USBHS_IRQn);
         RCC_HBPeriphClockCmd(RCC_HBPeriph_USBHS, DISABLE);
         RCC_USBHS_PLLCmd(DISABLE);
+        work_mode = WORK_MODE_IDLE;
     }
+}
+
+void usb_hc_low_level_init(struct usbh_bus *bus)
+{
+    (void)bus;
+
+    RCC_HBPeriphClockCmd(RCC_HBPeriph_USBHS, DISABLE);
+    RCC_USBHS_PLLCmd(DISABLE);
+    RCC_USBHSPLLCLKConfig(RCC_USBHSPLLSource_HSE);
+    RCC_USBHSPLLReferConfig(RCC_USBHSPLLRefer_8M);
+    RCC_USBHSPLLClockSourceDivConfig(RCC_USBHSPLL_IN_Div1);
+    RCC_USBHS_PLLCmd(ENABLE);
+    while (!(RCC->CTLR & RCC_USBHS_PLLRDY));
+
+    /* Enable USBHS Clock */
+    RCC_HBPeriphClockCmd(RCC_HBPeriph_USBHS, ENABLE);
+
+    /* Enable USBHS interrupt */
+    NVIC_EnableIRQ(USBHS_IRQn);
+
+    work_mode = WORK_MODE_USBH;
+}
+
+void usb_hc_low_level_deinit(struct usbh_bus *bus)
+{
+    (void)bus;
+
+    NVIC_DisableIRQ(USBHS_IRQn);
+    RCC_HBPeriphClockCmd(RCC_HBPeriph_USBHS, DISABLE);
+    RCC_USBHS_PLLCmd(DISABLE);
+    work_mode = WORK_MODE_IDLE;
 }
 
 __attribute__((interrupt())) void SysTick_Handler(void)
@@ -161,8 +208,16 @@ __attribute__((interrupt())) void USBHS_IRQHandler(void)
     /* enter interrupt */
     rt_interrupt_enter();
 
-    void USBD_IRQHandler(uint8_t busid);
-    USBD_IRQHandler(0);
+    if (work_mode == WORK_MODE_USBD)
+    {
+        void USBD_IRQHandler(uint8_t busid);
+        USBD_IRQHandler(0);
+    }
+    else if (work_mode == WORK_MODE_USBH)
+    {
+        void USBH_IRQHandler(uint8_t busid);
+        USBH_IRQHandler(0);
+    }
 
     /* leave interrupt */
     rt_interrupt_leave();

@@ -61,6 +61,7 @@
     ],
 
     "C_Cpp.default.defines": [
-        "REG_BASE0"
+        "USBD_REG_BASE0",
+        "USBH_REG_BASE0",
     ],
 }

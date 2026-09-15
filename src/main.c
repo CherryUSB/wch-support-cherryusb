@@ -18,5 +18,5 @@
 
 int main(void)
 {
-    usbh_initialize(0, REG_BASE0, NULL);
+    usbh_initialize(0, USBH_REG_BASE0, NULL);
 }

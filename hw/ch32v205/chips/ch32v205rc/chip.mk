@@ -24,7 +24,9 @@ SRCS +=
 LIBS +=
 
 # --- Compiler Flags ---
-CFLAGS += -DREG_BASE0=0x40023400
+CFLAGS += \
+	-DUSBD_REG_BASE0=0x40023400 \
+	-DUSBH_REG_BASE0=0x40023500 \
 
 # --- Linker Flags ---
 LDFLAGS += -T "$(CHIP_DIR)/linker_script/Link.ld"
