@@ -81,9 +81,7 @@ SRCS += \
 	$(wildcard $(CURDIR)/src/*.c) \
 	$(wildcard $(CURDIR)/CherryUSB/core/*.c) \
 	$(wildcard $(CURDIR)/rtos/rtthread-nano/rt-thread/src/*.c) \
-	$(CURDIR)/rtos/rtthread-nano/rt-thread/components/finsh/cmd.c \
-	$(CURDIR)/rtos/rtthread-nano/rt-thread/components/finsh/msh.c \
-	$(CURDIR)/rtos/rtthread-nano/rt-thread/components/finsh/shell.c \
+	$(wildcard $(CURDIR)/rtos/rtthread-nano/rt-thread/components/finsh/*.c) \
 
 # --- Add Compiler Flags ---
 CFLAGS += -D__RTTHREAD__

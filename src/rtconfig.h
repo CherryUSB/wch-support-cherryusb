@@ -102,6 +102,7 @@
 //  <i>Dynamic Heap Management
 #define RT_USING_HEAP
 #define RT_USING_SMALL_MEM
+#define RT_USING_SMALL_MEM_AS_HEAP
 // </c>
 // <c1>using tiny size of memory
 //  <i>using tiny size of memory
@@ -121,9 +122,25 @@
 // </h>
 
 // <h>FinSH Configuration
-// <c1>include finsh config
-//  <i>Select this choice if you using FinSH 
-#include "finsh_config.h"
+// <c1>Using FinSH
+//  <i>Select this choice if you using FinSH
+#define RT_USING_FINSH
+// </c>
+// <o>the priority of finsh thread <1-30>
+//  <i>the priority of finsh thread
+//  <i>Default: 20
+#define FINSH_THREAD_PRIORITY       21
+// <o>the stack of finsh thread <1-4096>
+//  <i>the stack of finsh thread
+//  <i>Default: 2048  (2048Byte)
+#define FINSH_THREAD_STACK_SIZE     1024
+// <c1>Using symbol table
+//  <i>Using symbol table
+#define FINSH_USING_SYMTAB
+// </c>
+// <c1>Enable command description
+//  <i>Enable command description
+#define FINSH_USING_DESCRIPTION
 // </c>
 // </h>
 
