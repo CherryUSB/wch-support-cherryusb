@@ -32,18 +32,9 @@ LIB_DIR +=
 
 # --- Assembly Source Files ---
 ASMS += \
+	startup_ch32h417_v3f.S \
 	context_gcc.S \
 	interrupt_gcc.S \
-
-ifeq ($(CORE),V5F)
-CFLAGS += -DCore_V5F
-ASMS += startup_ch32h417_v5f.S
-LDFLAGS += -T "$(CHIP_DIR)/linker_script/Link_v5f.ld"
-else
-CFLAGS += -DCore_V3F
-ASMS += startup_ch32h417_v3f.S
-LDFLAGS += -T "$(CHIP_DIR)/linker_script/Link_v3f.ld"
-endif
 
 # --- C Source Files ---
 SRCS += $(foreach dir,$(SRC_DIR),$(wildcard $(dir)/*.c))
@@ -68,8 +59,9 @@ CFLAGS += \
 	-g \
 	-gdwarf-4 \
 	-std=gnu11 \
-	$(addprefix -I,$(INCLUDES))\
-	$(addprefix -L,$(LIB_DIR))\
+	$(addprefix -I,$(INCLUDES)) \
+	$(addprefix -L,$(LIB_DIR)) \
+	-DCore_V3F \
 
 # --- Linker Flags ---
 LDFLAGS += \
@@ -82,3 +74,4 @@ LDFLAGS += \
 	-Wl,-Map,$(MAP_FILE) \
 	--specs=nano.specs \
 	--specs=nosys.specs \
+	-T "$(CHIP_DIR)/linker_script/Link_v3f.ld" \

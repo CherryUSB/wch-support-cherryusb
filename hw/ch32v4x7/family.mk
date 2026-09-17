@@ -52,8 +52,8 @@ CFLAGS += \
 	-g \
 	-gdwarf-4 \
 	-std=gnu11 \
-	$(addprefix -I,$(INCLUDES))\
-	$(addprefix -L,$(LIB_DIR))\
+	$(addprefix -I,$(INCLUDES)) \
+	$(addprefix -L,$(LIB_DIR)) \
 
 # --- Linker Flags ---
 LDFLAGS += \

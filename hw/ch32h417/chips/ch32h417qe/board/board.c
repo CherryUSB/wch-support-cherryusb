@@ -34,9 +34,13 @@ work_mode_t work_mode = WORK_MODE_IDLE;
 /* @function declaration */
 static void _usart_config(void);
 static uint32_t _systick_config(rt_uint32_t ticks);
+static void _usbhs_rcc_config(bool enable);
 
 void rt_hw_board_init()
 {
+    /* System Clock Configuration */
+    SystemInit();
+
     /* USART Configuration */
     _usart_config();
 
@@ -99,6 +103,45 @@ static uint32_t _systick_config(rt_uint32_t ticks)
     return 0;
 }
 
+static void _usbhs_rcc_config(bool enable)
+{
+    if (enable)
+    {
+        /* Disable JTAG Port */
+        RCC_HB2PeriphClockCmd(RCC_HB2Periph_AFIO, ENABLE);
+        GPIO_PinRemapConfig(GPIO_Remap_SWJ_Disable, ENABLE);
+
+        if ((RCC->PLLCFGR & RCC_SYSPLL_SEL) != RCC_SYSPLL_USBHS)
+        {
+            /* Initialize USBHS 480M PLL */
+            RCC_USBHS_PLLCmd(DISABLE);
+            RCC_USBHSPLLCLKConfig(RCC_USBHSPLLSource_HSE);
+            RCC_USBHSPLLReferConfig(RCC_USBHSPLLRefer_25M);
+            RCC_USBHSPLLClockSourceDivConfig(RCC_USBHSPLL_IN_Div1);
+            RCC_USBHS_PLLCmd(ENABLE);
+            while (!(RCC->CTLR & RCC_USBHS_PLLRDY));
+        }
+        /* Enable UTMI Clock */
+        RCC_UTMIcmd(ENABLE);
+
+        /* Enable USBHS Clock */
+        RCC_HBPeriphClockCmd(RCC_HBPeriph_USBHS, ENABLE);
+
+        /* Enable USBHS interrupt */
+        NVIC_EnableIRQ(USBHS_IRQn);
+    }
+    else
+    {
+        NVIC_DisableIRQ(USBHS_IRQn);
+        RCC_HBPeriphClockCmd(RCC_HBPeriph_USBHS, DISABLE);
+        RCC_UTMIcmd(DISABLE);
+        if ((RCC->PLLCFGR & RCC_SYSPLL_SEL) != RCC_SYSPLL_USBHS)
+        {
+            RCC_USBHS_PLLCmd(DISABLE);
+        }
+    }
+}
+
 void rt_hw_console_output(const char *str)
 {
     rt_size_t size = rt_strlen(str);
@@ -125,24 +168,8 @@ void usb_dc_low_level_init(uint8_t busid)
 {
     if (busid == 0)
     {
-        if ((RCC->PLLCFGR & RCC_SYSPLL_SEL) != RCC_SYSPLL_USBHS)
-        {
-            /* Initialize USBHS 480M PLL */
-            RCC_USBHS_PLLCmd(DISABLE);
-            RCC_USBHSPLLCLKConfig(RCC_USBHSPLLSource_HSE);
-            RCC_USBHSPLLReferConfig(RCC_USBHSPLLRefer_25M);
-            RCC_USBHSPLLClockSourceDivConfig(RCC_USBHSPLL_IN_Div1);
-            RCC_USBHS_PLLCmd(ENABLE);
-            while (!(RCC->CTLR & RCC_USBHS_PLLRDY));
-        }
-        /* Enable UTMI Clock */
-        RCC_UTMIcmd(ENABLE);
-
-        /* Enable USBHS Clock */
-        RCC_HBPeriphClockCmd(RCC_HBPeriph_USBHS, ENABLE);
-
-        /* Enable USBHS interrupt */
-        NVIC_EnableIRQ(USBHS_IRQn);
+        _usbhs_rcc_config(true);
+        work_mode = WORK_MODE_USBD;
     }
 }
 
@@ -150,13 +177,8 @@ void usb_dc_low_level_deinit(uint8_t busid)
 {
     if (busid == 0)
     {
-        NVIC_DisableIRQ(USBHS_IRQn);
-        RCC_HBPeriphClockCmd(RCC_HBPeriph_USBHS, DISABLE);
-        RCC_UTMIcmd(DISABLE);
-        if ((RCC->PLLCFGR & RCC_SYSPLL_SEL) != RCC_SYSPLL_USBHS)
-        {
-            RCC_USBHS_PLLCmd(DISABLE);
-        }
+        _usbhs_rcc_config(false);
+        work_mode = WORK_MODE_IDLE;
     }
 }
 
@@ -164,24 +186,8 @@ void usb_hc_low_level_init(struct usbh_bus *bus)
 {
     if (bus->busid == 0)
     {
-        if ((RCC->PLLCFGR & RCC_SYSPLL_SEL) != RCC_SYSPLL_USBHS)
-        {
-            /* Initialize USBHS 480M PLL */
-            RCC_USBHS_PLLCmd(DISABLE);
-            RCC_USBHSPLLCLKConfig(RCC_USBHSPLLSource_HSE);
-            RCC_USBHSPLLReferConfig(RCC_USBHSPLLRefer_25M);
-            RCC_USBHSPLLClockSourceDivConfig(RCC_USBHSPLL_IN_Div1);
-            RCC_USBHS_PLLCmd(ENABLE);
-            while (!(RCC->CTLR & RCC_USBHS_PLLRDY));
-        }
-        /* Enable UTMI Clock */
-        RCC_UTMIcmd(ENABLE);
-
-        /* Enable USBHS Clock */
-        RCC_HBPeriphClockCmd(RCC_HBPeriph_USBHS, ENABLE);
-
-        /* Enable USBHS interrupt */
-        NVIC_EnableIRQ(USBHS_IRQn);
+        _usbhs_rcc_config(true);
+        work_mode = WORK_MODE_USBH;
     }
 }
 
@@ -189,13 +195,8 @@ void usb_hc_low_level_deinit(struct usbh_bus *bus)
 {
     if (bus->busid == 0)
     {
-        NVIC_DisableIRQ(USBHS_IRQn);
-        RCC_HBPeriphClockCmd(RCC_HBPeriph_USBHS, DISABLE);
-        RCC_UTMIcmd(DISABLE);
-        if ((RCC->PLLCFGR & RCC_SYSPLL_SEL) != RCC_SYSPLL_USBHS)
-        {
-            RCC_USBHS_PLLCmd(DISABLE);
-        }
+        _usbhs_rcc_config(false);
+        work_mode = WORK_MODE_IDLE;
     }
 }
 
@@ -215,7 +216,7 @@ __attribute__((interrupt())) void SysTick0_Handler(void)
     FREE_INT_SP();
 }
 
-__attribute__((interrupt("WCH-Interrupt-fast"))) void USBHS_IRQHandler(void)
+__attribute__((interrupt())) void USBHS_IRQHandler(void)
 {
     GET_INT_SP();
 
