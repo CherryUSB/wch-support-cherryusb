@@ -33,6 +33,12 @@
         "${workspaceFolder}/hw/ch32f20x/system/*",
         "${workspaceFolder}/hw/ch32f20x/chips/ch32f203c8/board/*",
 
+        "${workspaceFolder}/hw/ch32h417/sdk/Core/*",
+        "${workspaceFolder}/hw/ch32h417/sdk/Debug/*",
+        "${workspaceFolder}/hw/ch32h417/sdk/Peripheral/inc/*",
+        "${workspaceFolder}/hw/ch32h417/system/*",
+        "${workspaceFolder}/hw/ch32h417/chips/ch32h417qe/board/*",
+
         "${workspaceFolder}/hw/ch32l103/sdk/Core/*",
         "${workspaceFolder}/hw/ch32l103/sdk/Debug/*",
         "${workspaceFolder}/hw/ch32l103/sdk/Peripheral/inc/*",
