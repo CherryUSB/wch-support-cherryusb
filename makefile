@@ -63,6 +63,9 @@ ifeq ($(CHIP_MK),)
   $(error This chip '$(CHIP)' is not supported)
 endif
 
+# --- Family Directories ---
+FAMILY_DIR := $(abspath $(CHIP_MK)/../)
+
 # --- Include Chip Makefiles ---
 include $(CHIP_MK)
 
@@ -70,9 +73,6 @@ include $(CHIP_MK)
 ifeq ($(filter $(IP), $(SUPPORT_IPS)),)
   $(error This IP '$(IP)' is not supported, supported IPs are '$(SUPPORT_IPS)')
 endif
-
-# --- Family Directories ---
-FAMILY_DIR := $(abspath $(CHIP_MK)/../)
 
 # --- Include Family Makefiles ---
 include $(FAMILY_DIR)/family.mk
