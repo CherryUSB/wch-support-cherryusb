@@ -37,8 +37,48 @@ SECTIONS
 		*(.text.*)
 		*(.rodata)
 		*(.rodata*)
+        *(.glue_7)
+        *(.glue_7t)		
 		*(.gnu.linkonce.t.*)
+		 /* section information for finsh shell */
 		. = ALIGN(4);
+		__fsymtab_start = .;
+		KEEP(*(FSymTab))
+		__fsymtab_end = .;
+		. = ALIGN(4);
+		__vsymtab_start = .;
+		KEEP(*(VSymTab))
+		__vsymtab_end = .;
+		. = ALIGN(4);
+		
+		/* section information for initial. */
+		. = ALIGN(4);
+		__rt_init_start = .;
+		KEEP(*(SORT(.rti_fn*)))
+		__rt_init_end = .;
+		. = ALIGN(4);
+
+		/* section information for modules */
+		. = ALIGN(4);
+		__rtmsymtab_start = .;
+		KEEP(*(RTMSymTab))
+		__rtmsymtab_end = .;
+
+		. = ALIGN(4);
+		
+    PROVIDE(__ctors_start__ = .);
+    KEEP (*(SORT(.init_array.*)))
+    KEEP (*(.init_array))
+    PROVIDE(__ctors_end__ = .);
+    . = ALIGN(4);
+
+    _etext = .;		
+
+	/* CherryUSB host class information */
+	. = ALIGN(4);
+	__usbh_class_info_start__ = .;
+	KEEP(*(.usbh_class_info))
+	__usbh_class_info_end__ = .;
 	} >FLASH AT>FLASH 
 
 	.fini :
@@ -159,6 +199,7 @@ SECTIONS
         PROVIDE(_susrstack = . );
         . = . + __stack_size;
         PROVIDE( _eusrstack = .);
+        PROVIDE( __rt_rvstack = . );	
     } >RAM 
 
 }

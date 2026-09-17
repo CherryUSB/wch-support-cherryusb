@@ -324,6 +324,7 @@ DMA2_Channel11_IRQHandler:
 handle_reset:
 .option push 
 .option	norelax 
+    csrw mepc, t0
 	la gp, __global_pointer$
 .option	pop 
 
@@ -360,10 +361,10 @@ handle_reset:
 	li t0, 0x01
 	csrw 0xBC1, t0
 /* Enable interrupt nesting and hardware stack */
-    li t0, 0x07
+    li t0, 0x0f
     csrw 0x804, t0
 /* Enable Vector operation and global interrupt, configure privileged mode */
-   	li t0, 0x688           
+   	li t0, 0x1E00           
    	csrw mstatus, t0
 /* Configure the interrupt vector table recognition mode and entry address mode */
  	la t0, _start
@@ -371,7 +372,7 @@ handle_reset:
 	csrw mtvec, t0
 
     jal  SystemInit
-	la t0, main
+	la t0, entry
 	csrw mepc, t0
 	mret
 

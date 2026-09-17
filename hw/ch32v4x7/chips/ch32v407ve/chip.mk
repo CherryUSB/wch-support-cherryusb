@@ -25,8 +25,8 @@ LIBS +=
 
 # --- Compiler Flags ---
 CFLAGS += \
-	-DREG_BASE0=0x40024000 \
-	-DREG_BASE1=0x40023400 \
+	-DUSBD_REG_BASE0=0x40024000 \
+	-DUSBH_REG_BASE0=0x40024100 \
 
 # --- Linker Flags ---
 LDFLAGS += -T "$(CHIP_DIR)/linker_script/Link.ld"

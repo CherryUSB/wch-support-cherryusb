@@ -12,9 +12,12 @@ INCLUDES += \
     $(FAMILY_DIR)/sdk/Debug \
     $(FAMILY_DIR)/sdk/Peripheral/inc \
     $(FAMILY_DIR)/system \
+    $(FAMILY_DIR)/libcpu \
 
 # --- Assembly Source Directories ---
-ASM_DIR += $(FAMILY_DIR)/sdk/Startup
+ASM_DIR += \
+	$(FAMILY_DIR)/sdk/Startup \
+	$(FAMILY_DIR)/libcpu \
 
 # --- C Source Directories ---
 SRC_DIR += \
@@ -22,12 +25,16 @@ SRC_DIR += \
     $(FAMILY_DIR)/sdk/Debug \
     $(FAMILY_DIR)/sdk/Peripheral/src \
     $(FAMILY_DIR)/system \
+    $(FAMILY_DIR)/libcpu \
 
 # --- Library Directories ---
 LIB_DIR +=
 
 # --- Assembly Source Files ---
-ASMS += startup_ch32v4x7.S
+ASMS += \
+	startup_ch32v4x7.S \
+	context_gcc.S \
+	interrupt_gcc.S \
 
 # --- C Source Files ---
 SRCS += $(foreach dir,$(SRC_DIR),$(wildcard $(dir)/*.c))
