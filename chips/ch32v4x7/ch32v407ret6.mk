@@ -1,0 +1,19 @@
+# --- Supported IPs ---
+SUPPORT_IPS := usbhs
+
+# --- Default IP ---
+ifeq ($(IP),)
+IP := usbhs
+endif
+
+# --- Compiler Flags ---
+CFLAGS += \
+	-DCONFIG_USB_MAX_BUS=1 \
+	-DCONFIG_USBDEV_MAX_BUS=CONFIG_USB_MAX_BUS \
+	-DCONFIG_USBHOST_MAX_BUS=CONFIG_USB_MAX_BUS \
+
+ifeq ($(IP),usbhs)
+CFLAGS += \
+	-DUSBD_REG_BASE0=0x40024000 \
+	-DUSBH_REG_BASE0=0x40024100 \
+endif

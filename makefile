@@ -1,7 +1,7 @@
 ifneq ($(filter all, $(MAKECMDGOALS)),)
-    ifndef CHIP
-        $(error No 'CHIP' parameter provided, Usage: make all CHIP=ch32v307vc)
-    endif
+  ifndef CHIP
+    $(error No 'CHIP' parameter provided, Usage: make all -j8 CHIP=ch32v205rct6)
+  endif
 
 # --- Output Directories ---
 OBJECT_DIR := build/$(CHIP)/object
@@ -25,6 +25,8 @@ INCLUDES := \
 	CherryUSB/core \
 	CherryUSB/common \
 	CherryUSB/demo \
+	CherryUSB/port/wch/usbfs \
+	CherryUSB/port/wch/usbhs \
 	$(wildcard CherryUSB/class/*) \
 	rtos/rtthread-nano/rt-thread/include \
 	rtos/rtthread-nano/rt-thread/components/finsh \
@@ -53,14 +55,26 @@ CFLAGS :=
 # --- Linker Flags ---
 LDFLAGS :=
 
-# --- Chip Directories ---
-CHIP_DIR := $(wildcard $(abspath hw/*/chips/$(CHIP)))
+# --- Chip Makefile ---
+CHIP_MK := $(wildcard chips/*/$(CHIP).mk)
+
+# --- Check if Chip Makefile Exists ---
+ifeq ($(CHIP_MK),)
+  $(error This chip '$(CHIP)' is not supported)
+endif
+
+# --- Include Chip Makefiles ---
+include $(CHIP_MK)
+
+# --- Check if IP is Supported ---
+ifeq ($(filter $(IP), $(SUPPORT_IPS)),)
+  $(error This IP '$(IP)' is not supported, supported IPs are '$(SUPPORT_IPS)')
+endif
 
 # --- Family Directories ---
-FAMILY_DIR := $(abspath $(CHIP_DIR)/../../)
+FAMILY_DIR := $(abspath $(CHIP_MK)/../)
 
-# --- Include Chip and Family Makefiles ---
-include $(CHIP_DIR)/chip.mk
+# --- Include Family Makefiles ---
 include $(FAMILY_DIR)/family.mk
 
 # --- Add C Source Files Directories ---
@@ -70,6 +84,7 @@ SRC_DIR += \
 	$(CURDIR)/CherryUSB/core \
 	$(CURDIR)/CherryUSB/common \
 	$(CURDIR)/CherryUSB/osal \
+	$(CURDIR)/CherryUSB/port/wch/$(IP) \
 	$(wildcard $(CURDIR)/CherryUSB/class/*) \
 	$(CURDIR)/rtos/rtthread-nano/rt-thread/src \
 	$(CURDIR)/rtos/rtthread-nano/rt-thread/components/finsh \
@@ -77,9 +92,11 @@ SRC_DIR += \
 # --- Add C Source Files ---
 SRCS += \
 	$(CURDIR)/CherryUSB/class/hub/usbh_hub.c \
+	$(CURDIR)/CherryUSB/class/hid/usbh_hid.c \
 	$(CURDIR)/CherryUSB/osal/usb_osal_rtthread.c \
 	$(wildcard $(CURDIR)/src/*.c) \
 	$(wildcard $(CURDIR)/CherryUSB/core/*.c) \
+	$(wildcard $(CURDIR)/CherryUSB/port/wch/$(IP)/*.c) \
 	$(wildcard $(CURDIR)/rtos/rtthread-nano/rt-thread/src/*.c) \
 	$(wildcard $(CURDIR)/rtos/rtthread-nano/rt-thread/components/finsh/*.c) \
 
