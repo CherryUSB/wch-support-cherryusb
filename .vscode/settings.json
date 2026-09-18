@@ -33,6 +33,12 @@
         "${workspaceFolder}/chips/ch32h417/board/*",
         "${workspaceFolder}/chips/ch32h417/libcpu/*",
 
+        "${workspaceFolder}/chips/ch32l103/sdk/Core/*",
+        "${workspaceFolder}/chips/ch32l103/sdk/Debug/*",
+        "${workspaceFolder}/chips/ch32l103/sdk/Peripheral/inc/*",
+        "${workspaceFolder}/chips/ch32l103/board/*",
+        "${workspaceFolder}/chips/ch32l103/libcpu/*",
+
         "${workspaceFolder}/chips/ch32v4x7/sdk/Core/*",
         "${workspaceFolder}/chips/ch32v4x7/sdk/Debug/*",
         "${workspaceFolder}/chips/ch32v4x7/sdk/Peripheral/inc/*",
@@ -50,6 +56,12 @@
         "${workspaceFolder}/chips/ch32v205/sdk/Peripheral/inc/*",
         "${workspaceFolder}/chips/ch32v205/board/*",
         "${workspaceFolder}/chips/ch32v205/libcpu/*",
+
+        "${workspaceFolder}/chips/ch32x3x5/sdk/Core/*",
+        "${workspaceFolder}/chips/ch32x3x5/sdk/Debug/*",
+        "${workspaceFolder}/chips/ch32x3x5/sdk/Peripheral/inc/*",
+        "${workspaceFolder}/chips/ch32x3x5/board/*",
+        "${workspaceFolder}/chips/ch32x3x5/libcpu/*",
     ],
 
     "C_Cpp.default.defines": [

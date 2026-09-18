@@ -172,7 +172,6 @@ static void usb_low_level_init(uint8_t busid, work_mode_t mode)
         work_mode[0] = mode;
         break;
     }
-
 }
 
 static void usb_low_level_deinit(uint8_t busid)
