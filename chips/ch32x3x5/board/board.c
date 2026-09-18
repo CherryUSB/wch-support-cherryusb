@@ -20,6 +20,8 @@
 #define GET_INT_SP()    asm("csrrw sp,mscratch,sp")
 #define FREE_INT_SP()   asm("csrrw sp,mscratch,sp")
 
+#define CONSOLE_MB_SIZE 64
+
 /* @enum */
 typedef enum
 {
@@ -29,7 +31,9 @@ typedef enum
 } work_mode_t;
 
 /* @global */
+static struct rt_mailbox console_mb;
 static work_mode_t work_mode[CONFIG_USB_MAX_BUS];
+static rt_ubase_t console_mb_pool[CONSOLE_MB_SIZE];
 
 /* @function declaration */
 static void usart_config(void);
@@ -57,6 +61,8 @@ void rt_hw_board_init()
     extern char _heap_end;
     rt_system_heap_init(&_end, &_heap_end);
 #endif
+
+    rt_mb_init(&console_mb, "console", console_mb_pool, CONSOLE_MB_SIZE, RT_IPC_FLAG_PRIO);
 
     for (int i = 0; i < sizeof(work_mode) / sizeof(work_mode[0]); i++)
     {
@@ -91,7 +97,11 @@ static void usart_config(void)
     USART_InitStructure.USART_Mode = USART_Mode_Tx | USART_Mode_Rx;
 
     USART_Init(USART1, &USART_InitStructure);
+    USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
     USART_Cmd(USART1, ENABLE);
+
+    NVIC_SetPriority(USART1_IRQn, 0xF0);
+    NVIC_EnableIRQ(USART1_IRQn);
 }
 
 static uint32_t systick_config(rt_uint32_t ticks)
@@ -127,7 +137,14 @@ void rt_hw_console_output(const char *str)
 
 char rt_hw_console_getchar(void)
 {
-    return USART1->STATR & USART_FLAG_RXNE ? (USART1->DATAR & 0xFF) : -1;
+    rt_ubase_t ch;
+
+    if (rt_mb_recv(&console_mb, &ch, RT_WAITING_FOREVER) != RT_EOK)
+    {
+        return -1;
+    }
+
+    return (char)ch;
 }
 
 static void usb_low_level_init(uint8_t busid, work_mode_t mode)
@@ -195,6 +212,22 @@ __attribute__((interrupt())) void SysTick_Handler(void)
 
     SysTick->SR = 0;
     rt_tick_increase();
+
+    rt_interrupt_leave();
+
+    FREE_INT_SP();
+}
+
+__attribute__((interrupt())) void USART1_IRQHandler(void)
+{
+    GET_INT_SP();
+
+    rt_interrupt_enter();
+
+    if (USART_GetFlagStatus(USART1, USART_FLAG_RXNE) != RESET)
+    {
+        rt_mb_send(&console_mb, (rt_ubase_t)(USART_ReceiveData(USART1) & 0xFF));
+    }
 
     rt_interrupt_leave();
 
