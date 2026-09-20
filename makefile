@@ -93,6 +93,8 @@ SRC_DIR += \
 SRCS += \
 	$(CURDIR)/CherryUSB/class/hub/usbh_hub.c \
 	$(CURDIR)/CherryUSB/class/hid/usbh_hid.c \
+	$(CURDIR)/CherryUSB/class/serial/usbh_serial.c \
+	$(CURDIR)/CherryUSB/class/serial/usbh_cdc_acm.c \
 	$(CURDIR)/CherryUSB/osal/usb_osal_rtthread.c \
 	$(wildcard $(CURDIR)/src/*.c) \
 	$(wildcard $(CURDIR)/CherryUSB/core/*.c) \

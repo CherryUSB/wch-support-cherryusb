@@ -45,6 +45,12 @@
         "${workspaceFolder}/chips/ch32v4x7/board/*",
         "${workspaceFolder}/chips/ch32v4x7/libcpu/*",
 
+        "${workspaceFolder}/chips/ch32v20x/sdk/Core/*",
+        "${workspaceFolder}/chips/ch32v20x/sdk/Debug/*",
+        "${workspaceFolder}/chips/ch32v20x/sdk/Peripheral/inc/*",
+        "${workspaceFolder}/chips/ch32v20x/board/*",
+        "${workspaceFolder}/chips/ch32v20x/libcpu/*",
+
         "${workspaceFolder}/chips/ch32v30x/sdk/Core/*",
         "${workspaceFolder}/chips/ch32v30x/sdk/Debug/*",
         "${workspaceFolder}/chips/ch32v30x/sdk/Peripheral/inc/*",
