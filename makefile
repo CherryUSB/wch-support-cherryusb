@@ -92,15 +92,17 @@ SRC_DIR += \
 # --- Add C Source Files ---
 SRCS += \
 	$(CURDIR)/CherryUSB/class/hub/usbh_hub.c \
-	$(CURDIR)/CherryUSB/class/hid/usbh_hid.c \
-	$(CURDIR)/CherryUSB/class/serial/usbh_serial.c \
-	$(CURDIR)/CherryUSB/class/serial/usbh_cdc_acm.c \
 	$(CURDIR)/CherryUSB/osal/usb_osal_rtthread.c \
 	$(wildcard $(CURDIR)/src/*.c) \
 	$(wildcard $(CURDIR)/CherryUSB/core/*.c) \
 	$(wildcard $(CURDIR)/CherryUSB/port/wch/$(IP)/*.c) \
 	$(wildcard $(CURDIR)/rtos/rtthread-nano/rt-thread/src/*.c) \
 	$(wildcard $(CURDIR)/rtos/rtthread-nano/rt-thread/components/finsh/*.c) \
+
+# --- Add Demo and Class Source Files ---
+SRCS += \
+	$(CURDIR)/CherryUSB/demo/cdc_acm_template.c \
+	$(CURDIR)/CherryUSB/class/cdc/usbd_cdc_acm.c \
 
 # --- Add Compiler Flags ---
 CFLAGS += -D__RTTHREAD__

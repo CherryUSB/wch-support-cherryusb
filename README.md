@@ -86,3 +86,20 @@ make clear
 ```
 
 输出文件位于 `build/<chip>/output/`，包含 `.elf`、`.bin`、`.hex`、`.lst` 及 `.map`。
+
+## 更换示例程序
+
+修改项目根目录的makefie文件 `# --- Add Demo and Class Source Files ---` 这一段即可更换参与编译的DEMO程序：
+
+```makefile
+# --- Add Demo and Class Source Files ---
+SRCS += \
+	$(wildcard $(CURDIR)/CherryUSB/demo/cdc_acm_template.c) \
+	$(wildcard $(CURDIR)/CherryUSB/class/cdc/usbd_cdc_acm.c) \
+```
+
+更换示例分三步：
+
+1. 把 demo 换成要跑的模板，例如 `CherryUSB/demo/hid_keyboard_template.c`；
+2. 补上该 demo 依赖的 class 驱动源码，组合类示例需要把用到的驱动都列上；
+3. 同步修改 `src/main.c`，调用新 demo 的入口函数。
